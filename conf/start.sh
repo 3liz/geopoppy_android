@@ -33,7 +33,7 @@ then
     echo "$SERVICE is already running"
 else
     echo "Start $SERVICE"
-    service pure-ftpd restart
+    sudo service pure-ftpd stop && sudo service pure-ftpd start
 fi
 
 SERVICE="redis"

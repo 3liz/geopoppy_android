@@ -87,11 +87,11 @@ echo "geopoppy" > /tmp/pureftpd.passwd
 echo "geopoppy" >> /tmp/pureftpd.passwd
 echo "" >> /tmp/pureftpd.passwd
 sudo chmod 0644 /tmp/pureftpd.passwd
-sudo pure-pw useradd geopoppy -u ftpuser -g ftpgroup -d /storage/internal/geopoppy/qgis/ -m < /tmp/pureftpd.passwd
+sudo pure-pw useradd geopoppy -u geopoppy -g geopoppy -d /storage/internal/geopoppy/qgis/ -m < /tmp/pureftpd.passwd
 sudo rm /tmp/pureftpd.passwd
 sudo ln -s /etc/pure-ftpd/conf/PureDB /etc/pure-ftpd/auth/50pure
 sudo pure-pw mkdb
-sudo service pure-ftpd restart
+sudo service pure-ftpd stop && sudo service pure-ftpd start
 
 #postgresql
 sudo cp /storage/internal/geopoppy/install/postgresql.conf /etc/postgresql/11/main/
@@ -106,6 +106,16 @@ sudo -u postgres psql -d postgres -c "ALTER USER geopoppy WITH ENCRYPTED PASSWOR
 sudo -u postgres psql -d postgres -c "ALTER USER postgres WITH ENCRYPTED PASSWORD 'postgres';"
 sudo -u postgres createdb geopoppy
 sudo -u postgres psql -d geopoppy -c "CREATE EXTENSION postgis;CREATE EXTENSION hstore;"
+# Add service file
+cat > /etc/postgresql-common/pg_service.conf <<EOF
+[geopoppy]
+host=localhost
+dbname=geopoppy
+user=geopoppy
+port=5432
+password=geopoppy
+EOF
+
 
 # Copy start script to /etc/profile.d/s_start_geopoppy_services.sh
 # Services will be started at the first SSH login only
