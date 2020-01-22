@@ -85,6 +85,7 @@ sudo groupadd ftpgroup
 sudo useradd -g ftpgroup -d /dev/null -s /etc ftpuser
 echo "geopoppy" > /tmp/pureftpd.passwd
 echo "geopoppy" >> /tmp/pureftpd.passwd
+echo "" >> /tmp/pureftpd.passwd
 sudo chmod 0644 /tmp/pureftpd.passwd
 sudo pure-pw useradd geopoppy -u ftpuser -g ftpgroup -d /storage/internal/geopoppy/qgis/ -m < /tmp/pureftpd.passwd
 sudo rm /tmp/pureftpd.passwd
@@ -106,7 +107,10 @@ sudo -u postgres psql -d postgres -c "ALTER USER postgres WITH ENCRYPTED PASSWOR
 sudo -u postgres createdb geopoppy
 sudo -u postgres psql -d geopoppy -c "CREATE EXTENSION postgis;CREATE EXTENSION hstore;"
 
-
+# Copy start script to /etc/profile.d/s_start_geopoppy_services.sh
+# Services will be started at the first SSH login only
+# Which means when the user type the Userland session password for geopoppy
+sudo cp /storage/internal/geopoppy/conf/start.sh /etc/profile.d/z_start_geopoppy_services.sh
 
 
 
