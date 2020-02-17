@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# Get last geopoppy content
+cd /storage/internal/
+geopoppy_branch=bustter
+wget "https://github.com/3liz/geopoppy_android/archive/$geopoppy_branch.zip"
+unzip "$geopoppy_branch.zip"
+mv "geopoppy_android-$geopoppy_branch" geopoppy
+rm "$geopoppy_branch.zip"
+
 # Nginx
 cp /storage/internal/geopoppy/install/default /etc/nginx/sites-enabled/default
 
