@@ -1,28 +1,30 @@
 #!/bin/sh
 
-# locales (needed for PostgreSQL)
+sudo apt update
+sudo apt dist-upgrade -y
+sudo apt install -y nano locales dialog apt-utils
+
+# timezone
 sudo echo "Europe/Paris" > /etc/timezone
 sudo dpkg-reconfigure -f noninteractive tzdata
-sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-sudo sed -i -e 's/# fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
-sudo echo 'LANG="fr_FR.UTF-8"'>/etc/default/locale
-sudo dpkg-reconfigure --frontend=noninteractive locales
+
+# locales (needed for PostgreSQL)
+locale-gen fr_FR.UTF-8
 sudo update-locale LANG=fr_FR.UTF-8
+sudo dpkg-reconfigure --frontend=noninteractive locales
 sudo export LANG="fr_FR.UTF-8"
 sudo export LANGUAGE="fr_FR.UTF-8"
 sudo export LC_ALL="fr_FR.UTF-8"
 
-sudo apt-get update
-
 # PostgreSQL
-sudo apt-get install -f -y -t buster postgresql postgresql-contrib postgis --fix-missing
+sudo apt install -f -y -t buster postgresql-11 postgresql-11-postgis-2.5 --fix-missing
 
 # Needed for QGIS
-sudo echo "deb    http://http.debian.net/debian sid main " >> /etc/apt/sources.list
+sudo echo "deb    http://http.debian.net/debian sid main " > /etc/apt/sources.list.d/sid.list
 
 # Other packages
-sudo apt-get update
-sudo apt-get install -y -t sid -y --fix-missing \
+sudo apt update
+sudo apt install -y -t sid -y --fix-missing \
     wget \
     curl \
     nano \
@@ -46,7 +48,11 @@ sudo apt-get install -y -t sid -y --fix-missing \
     python3-qgis \
     python3-wheel \
     python3-lxml \
+    python3-zmq \
+    python3-jsonschema \
+    python3-dateutil \
     python3-psutil \
+    python3-redis \
     qgis-server \
     xvfb \
     libzmq5 \
