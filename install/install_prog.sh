@@ -17,6 +17,7 @@ sudo export LANGUAGE="fr_FR.UTF-8"
 sudo export LC_ALL="fr_FR.UTF-8"
 
 # PostgreSQL
+# INSTALL FIRST WITH BUSTER !
 sudo apt install -f -y -t buster postgresql-11 postgresql-11-postgis-2.5 --fix-missing
 
 # Needed for QGIS
