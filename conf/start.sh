@@ -92,41 +92,20 @@ else
     sudo service pure-ftpd restart
 fi
 
-# QGIS SERVER
-SERVICE="qgisserver"
+
+# SUPERVISOR
+# This tool runs qgisserver and wpsserver
+SERVICE="supervisor"
 if pgrep "$SERVICE" >/dev/null
 then
     echo "$SERVICE is running"
     if [ $ACTION = 'forcestart' ]
     then
-        pkill $SERVICE
-        rm /tmp/qgisserver.log
-        export QGIS_OPTIONS_PATH=$QOP && nohup qgisserver -c /storage/internal/geopoppy/conf/qgisserver.conf --rootdir / > /tmp/qgisserver.log &
+        echo "Force restart"
+        rm /tmp/supervisor.sock
+        sudo service supervisor stop && sudo service supervisor start
     fi
 else
-    echo "Start $SERVICE"
-    pkill $SERVICE
-    rm /tmp/qgisserver.log
-    export QGIS_OPTIONS_PATH=$QOP && nohup qgisserver -c /storage/internal/geopoppy/conf/qgisserver.conf --rootdir / > /tmp/qgisserver.log &
-fi
-
-
-SERVICE="wpsserver"
-if pgrep "$SERVICE" >/dev/null
-then
-    echo "$SERVICE is running"
-    if [ $ACTION = 'forcestart' ]
-    then
-        pkill $SERVICE
-        rm /tmp/wpsserver.log
-        export QGIS_OPTIONS_PATH=$QOP && export LIZSYNC_CONFIG_FILE=$LIZ && nohup wpsserver -b 127.0.0.1 -p 8081 -c /storage/internal/geopoppy/conf/wpsserver.conf > /tmp/wpsserver.log &
-    fi
-else
-    echo "Start $SERVICE"
-    pkill $SERVICE
-    rm /tmp/wpsserver.log
-    export QGIS_OPTIONS_PATH=$QOP && export LIZSYNC_CONFIG_FILE=$LIZ && nohup wpsserver -b 127.0.0.1 -p 8081 -c /storage/internal/geopoppy/conf/wpsserver.conf > /tmp/wpsserver.log &
-fi
 
 
 mydevice="wlan0"

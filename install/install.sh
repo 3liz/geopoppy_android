@@ -16,12 +16,12 @@ cp /storage/internal/geopoppy/install/php.ini /etc/php/7.3/fpm/php.ini
 #ln -s /usr/lib/libc-client.a /usr/lib/aarch64-linux-gnu/libc-client.a
 #ln -s /usr/lib/libc-client.a /usr/lib/arm-linux-gnueabihf/libc-client.a
 
-# start nginx +phpfpm
-sudo service nginx start
+# start nginx + phpfpm
+service nginx start
 sudo service php7.3-fpm start
 
 # lizmap web client
-lizmap_version=3.3.4
+lizmap_version=3.3.6
 lizmap_wps_version=master
 lizmap_wps_git=https://github.com/3liz/lizmap-wps-web-client-module.git
 mkdir /www
@@ -64,6 +64,14 @@ rm -rf py-qgis-server && rm -rf /root/.cache /root/.ccache
 #cd ..
 #rm -rf lizmap-plugin
 #rm -rf /root/.cache /root/.ccache
+
+# Debug python
+# Si erreur suivante à la compile
+# MemoryError
+# Commenter la ligne CFUNCTYPE(c_int)(lambda: None)
+#https://stackoverflow.com/questions/5914673/python-ctypes-memoryerror-in-fcgi-process-from-pil-library
+sed -i "s/CFUNCTYPE(c_int)(lambda: None)/#CFUNCTYPE(c_int)(lambda: None)/" /usr/lib/python2.7/ctypes/__init__.py
+sed -i "s/CFUNCTYPE(c_int)(lambda: None)/#CFUNCTYPE(c_int)(lambda: None)/" /usr/lib/python2.7/ctypes/__init__.py
 
 # py-qgis-wps
 cd ~
@@ -108,13 +116,18 @@ sudo pure-pw mkdb
 sudo service pure-ftpd stop && sudo service pure-ftpd start
 sudo service pure-ftpd status
 
-#postgresql
+# PostgreSQL
+# !!!!!
 # NB: PostgreSQL must NOT be run as root, but as geopoppy
 # NO sudo
+# !!!!!
 sudo chmod 0600 /etc/ssl/private/ssl-cert-snakeoil.key
 pg_dropcluster --stop 11 main
 pg_createcluster --start --locale fr_FR.UTF-8 --lc-collate fr_FR.UTF-8 --lc-ctype fr_FR.UTF-8 -e UTF-8 --port 5432 11 main
-echo "listen_addresses = '*'" >> /etc/postgresql/11/main/postgresql.conf
+cp /storage/internal/geopoppy/install/postgresql.conf /etc/postgresql/11/main/postgresql.conf
+sed -i "s/9.6/11/g" /etc/postgresql/11/main/postgresql.conf
+echo "host    all             all             0.0.0.0/0              md5" >> /etc/postgresql/11/main/pg_hba.conf
+
 service postgresql restart
 # createuser geopoppy --superuser # not needed because cluster has been created by geopoppy
 psql -d postgres -c "ALTER USER geopoppy WITH ENCRYPTED PASSWORD 'geopoppy';"
