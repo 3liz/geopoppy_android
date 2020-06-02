@@ -65,6 +65,6 @@ sudo apt install -y -t buster-backports -y --fix-missing \
     lftp \
     pure-ftpd pure-ftpd-common \
     make \
-    gosu \
-    supervisor
+    gosu
+    #supervisor
 

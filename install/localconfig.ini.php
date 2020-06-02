@@ -1,18 +1,13 @@
 ;<?php die(''); ?>
 ;for security reasons , don't remove or modify the first line
 
+modulesPath="lib:jelix-admin-modules/,lib:jelix-modules/,lib:vendor-modules/,app:modules/,app:lizmap-modules,/storage/internal/geopoppy/lizmap/modules/"
 
 [modules]
-wps.access=2
+geopoppy.access=2
 
-[wps]
-wps_rootUrl=127.0.0.1:8081/
-ows_url=127.0.0.1:8080/ows/
-wps_rootDirectories="/storage/internal/geopoppy/qgis"
-redis_host=127.0.0.1
-redis_port=6379
-redis_db=1
-redis_key_prefix=wpslizmap
+[jcommunity]
+resetAdminPasswordEnabled = off
 
 [urlengine]
 ;checkHttpsOnParsing=

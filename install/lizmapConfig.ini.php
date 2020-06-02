@@ -41,8 +41,8 @@ rootRepositories=
 relativeWMSPath=true
 
 
-[repository:demo]    
+[repository:demo]
 label=demo
-path="/storage/internal/geopoppy/qgis"
+path="/storage/internal/geopoppy/qgis/demo/"
 allowUserDefinedThemes=1
 
