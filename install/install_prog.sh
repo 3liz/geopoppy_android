@@ -62,9 +62,11 @@ sudo apt install -y -t buster-backports -y --fix-missing \
     xvfb \
     libzmq5 \
     redis-server \
+    spawn-fcgi
     lftp \
     pure-ftpd pure-ftpd-common \
     make \
-    gosu
-    #supervisor
+    gosu \
+    multiwatch
+
 

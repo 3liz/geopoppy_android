@@ -20,6 +20,15 @@ nano sites-enabled/default
         ssl_certificate      /etc/nginx/server.crt;
         ssl_certificate_key  /etc/nginx/server.key;
 
+# redis - We need to adapt service file
+nano /etc/init.d/redis-server
+# commenter les 3 lignes
+#       if [ -n "$ULIMIT" ]
+#       then
+#               ulimit -n $ULIMIT || true
+#       fi
+# Run redis
+sudo service redis-server start
 
 # PHP-FPM
 cp /storage/internal/geopoppy/install/php.ini /etc/php/7.3/fpm/php.ini
@@ -48,9 +57,11 @@ mkdir -p /storage/internal/geopoppy/lizmap/modules
 cd /tmp/
 lizmap_gp_version=master
 lizmap_gp_git=https://github.com/3liz/lizmap-geopoppy-module.git
+rm -rf /tmp/lizmap-geopoppy-module
 git clone --branch $lizmap_gp_version --depth=1 $lizmap_gp_git
+rm -rf /storage/internal/geopoppy/lizmap/modules/geopoppy
 mv lizmap-geopoppy-module/geopoppy /storage/internal/geopoppy/lizmap/modules/geopoppy
-rm -rf lizmap-geopoppy
+rm -rf /tmp/lizmap-geopoppy-module
 
 # lizmap wps module
 #cd /tmp/
@@ -68,7 +79,6 @@ cp lizmap/var/config/profiles.ini.php.dist     lizmap/var/config/profiles.ini.ph
 php lizmap/install/installer.php
 sudo sh lizmap/install/set_rights.sh www-data www-data
 sh lizmap/install/clean_vartmp.sh
-cd ~
 cat >> lizmap/var/config/profiles.ini.php <<EOF
 
 [jdb:search]
@@ -88,15 +98,25 @@ password="geopoppy"
 
 EOF
 
+# modify GPS refresh frequence
+# sed -i "s/maximumAge: 5000/maximumAge: 10000/g" lizmap/www/js/map.js
+
 
 #py-qgis-server
-cd ~
-git_repository=https://github.com/3liz/py-qgis-server.git
-git_branch=master
-git clone --branch $git_branch --depth=1 $git_repository py-qgis-server
-make -C py-qgis-server dist
-sudo pip3 install py-qgis-server/build/dist/*.tar.gz
-rm -rf py-qgis-server && rm -rf /root/.cache /root/.ccache
+# DEACTIVATED: we use spawn-fcgi
+# On big projects, sometimes the server hanged with no logs
+#cd ~
+#git_repository=https://github.com/3liz/py-qgis-server.git
+#git_branch=master
+#git clone --branch $git_branch --depth=1 $git_repository py-qgis-server
+#make -C py-qgis-server dist
+#sudo pip3 install py-qgis-server/build/dist/*.tar.gz
+#rm -rf py-qgis-server && rm -rf /root/.cache /root/.ccache
+
+# QGIS Server: copy nginx vhost
+cp /storage/internal/geopoppy/install/qgisserver /etc/nginx/sites-available/qgisserver
+ln -s /etc/nginx/sites-available/qgisserver /etc/nginx/sites-enabled/qgisserver
+service nginx restart
 
 # lizmap plugin api
 #api_branch=master
@@ -206,48 +226,25 @@ ls -lh /usr/share/qgis/svg/
 #sudo service supervisor stop && sudo service supervisor start
 #ls -lh /tmp/qg*
 
+
 # Copy start script to /etc/profile.d/s_start_geopoppy_services.sh
 # Services will be started at the first SSH login only
 # Which means when the user type the Userland session password for geopoppy
 sudo cp /storage/internal/geopoppy/conf/start.sh /etc/profile.d/z_start_geopoppy_services.sh
 
-# GET IP
-mydevice="wlan0"
-myip=$(ip add | grep "global $mydevice" | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
-echo "GEOPOPPY IP ADDRESS = $myip"
+# Restart all services
+sh /storage/internal/geopoppy/conf/start.sh
 
-# ACTIONS post installation
+# ACTIONS after 1st installation
 # ===========================
 
-# Si plantage sur connexion FTP:
-# supprimer tous les fichiers
-# recharger serveur FTP
-# lftp -p 2021 geopoppy@192.168.1.29
-# mkdir test
-
-# Supprimer les répertoires inutiles
+# Remove demo files and db files
 rm -rf /storage/internal/geopoppy/db
 rm -rf /storage/internal/geopoppy/qgis/*
 
-# Charger les scripts processing lizsync
-#cd /storage/internal/geopoppy/processing
-#LVERSION=0.3.4
-#wget https://github.com/3liz/qgis-lizsync-plugin/releases/download/$LVERSION/lizsync.$LVERSION.zip
-#unzip lizsync."$LVERSION".zip
-#rm lizsync."$LVERSION".zip
-
-# Utiliser les outils lizsync pour déployer bdd sur le clone
-# utiliser les outils lizsync pour récupérer les données depuis le FTP central
-# utiliser les outils lizsync pour charger les données vers la tablette
-
-# Redémarrer les services (surtout pour WPS)
-
-
-
-
-
-
-
-
+# If errors encountered for FTP connection:
+# Connect from outside
+# lftp -p 2021 geopoppy@192.168.1.29
+# mkdir test
 
 

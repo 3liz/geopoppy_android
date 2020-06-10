@@ -1,0 +1,9 @@
+server {
+    listen 2081;
+    ssl off;
+    location /qgisserver {
+        gzip           off;
+        include        fastcgi_params;
+        fastcgi_pass   unix:/var/run/qgisserver.socket;
+    }
+}

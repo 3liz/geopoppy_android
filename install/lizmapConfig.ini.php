@@ -7,7 +7,8 @@ hideSensitiveServicesProperties=1
 ;Services
 ;list the different map services (servers, generic parameters, etc.)
 [services]
-wmsServerURL="http://127.0.0.1:8080/ows/"
+;wmsServerURL="http://127.0.0.1:8080/ows/"
+wmsServerURL="http://localhost:2081/qgisserver"
 ;List of URL available for the web client
 onlyMaps=0
 defaultRepository=
@@ -35,7 +36,7 @@ cacheRootDirectory="/tmp/"
 allowUserAccountRequests=off
 
 ; path to find repositories
-rootRepositories=
+rootRepositories="/storage/internal/geopoppy/qgis/"
 
 ; Use relative path
 relativeWMSPath=true
