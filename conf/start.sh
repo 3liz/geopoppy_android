@@ -114,7 +114,7 @@ export QGIS_SERVER_PARALLEL_RENDERING=1
 export QGIS_SERVER_IGNORE_BAD_LAYERS=TRUE
 export QGIS_PREFIX_PATH=/usr
 export QGIS_SERVER_OVERRIDE_SYSTEM_LOCALE=fr
-if pgrep "$SERVICE" >/dev/null
+if pgrep multiwatch >/dev/null
 then
     echo "$SERVICE is running"
     if [ $ACTION = 'restart' ]
@@ -128,9 +128,12 @@ then
         if pgrep "$SERVICE" >/dev/null
         then
             pgrep $SERVICE | xargs kill -9
+        fi
+        if pgrep multiwatch >/dev/null
+        then
+            pgrep multiwatch | xargs kill -9
             pkill multiwatch
             pkill spawn-fcgi
-            pkill qgis
         fi
         #nohup spawn-fcgi -s /var/run/qgisserver.socket -U www-data -G www-data -n /usr/lib/cgi-bin/qgis_mapserv.fcgi > /tmp/nohup-spawn.log 2>&1 &
         nohup spawn-fcgi -n -s /var/run/qgisserver.socket -u www-data -U www-data -G www-data -- /usr/bin/multiwatch -f 3 -- /usr/lib/cgi-bin/qgis_mapserv.fcgi > /tmp/nohup-spawn.log 2>&1 &
@@ -142,7 +145,8 @@ else
 fi
 echo "Test qgisserver"
 sleep 1
-pgrep $SERVICE
+pgrep qgis
+
 
 # Get IP
 mydevice="wlan0"
